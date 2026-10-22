@@ -22,15 +22,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +44,6 @@ import kz.mtemirbay.shop.core.designsystem.ShopTheme
 import kz.mtemirbay.shop.core.ui.formatPriceKzt
 import kz.mtemirbay.shop.feature.cart.generated.resources.Res
 import kz.mtemirbay.shop.feature.cart.generated.resources.cart_checkout
-import kz.mtemirbay.shop.feature.cart.generated.resources.cart_checkout_soon
 import kz.mtemirbay.shop.feature.cart.generated.resources.cart_decrease
 import kz.mtemirbay.shop.feature.cart.generated.resources.cart_empty
 import kz.mtemirbay.shop.feature.cart.generated.resources.cart_go_to_catalog
@@ -62,25 +57,15 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CartScreen(onBack: () -> Unit, onGoToCatalog: () -> Unit) {
+fun CartScreen(onBack: () -> Unit, onGoToCatalog: () -> Unit, onCheckout: () -> Unit) {
     val viewModel = koinViewModel<CartViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val checkoutSoonMessage = stringResource(Res.string.cart_checkout_soon)
-    LaunchedEffect(viewModel) {
-        viewModel.effects.collect { effect ->
-            when (effect) {
-                CartEffect.CheckoutNotAvailable -> snackbarHostState.showSnackbar(checkoutSoonMessage)
-            }
-        }
-    }
-
     CartContent(
         state = state,
-        snackbarHostState = snackbarHostState,
         onBack = onBack,
         onGoToCatalog = onGoToCatalog,
+        onCheckout = onCheckout,
         onEvent = viewModel::onEvent,
     )
 }
@@ -89,9 +74,9 @@ fun CartScreen(onBack: () -> Unit, onGoToCatalog: () -> Unit) {
 @Composable
 internal fun CartContent(
     state: CartState,
-    snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,
     onGoToCatalog: () -> Unit,
+    onCheckout: () -> Unit,
     onEvent: (CartEvent) -> Unit,
 ) {
     Scaffold(
@@ -103,10 +88,9 @@ internal fun CartContent(
         },
         bottomBar = {
             if (state.items.isNotEmpty()) {
-                CartSummary(state.totalQuantity, state.totalPriceKzt, onCheckout = { onEvent(CartEvent.Checkout) })
+                CartSummary(state.totalQuantity, state.totalPriceKzt, onCheckout = onCheckout)
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         if (state.items.isEmpty()) {
             EmptyCart(onGoToCatalog, Modifier.padding(padding))
@@ -230,9 +214,9 @@ private fun CartContentPreview() {
                 totalQuantity = 3,
                 totalPriceKzt = 392_970,
             ),
-            snackbarHostState = remember { SnackbarHostState() },
             onBack = {},
             onGoToCatalog = {},
+            onCheckout = {},
             onEvent = {},
         )
     }

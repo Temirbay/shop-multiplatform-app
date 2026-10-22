@@ -10,7 +10,7 @@ import kz.mtemirbay.shop.core.ui.MviViewModel
 
 internal class CartViewModel(
     private val cartRepository: CartRepository,
-) : MviViewModel<CartState, CartEvent, CartEffect>(CartState()) {
+) : MviViewModel<CartState, CartEvent, Nothing>(CartState()) {
 
     init {
         // Итоги вычисляются из items при каждом изменении, а не хранятся отдельно — не могут разойтись со списком
@@ -24,7 +24,6 @@ internal class CartViewModel(
             is CartEvent.Increase -> changeQuantity(event.productId, delta = 1)
             is CartEvent.Decrease -> changeQuantity(event.productId, delta = -1)
             is CartEvent.Remove -> viewModelScope.launch { cartRepository.remove(event.productId) }
-            CartEvent.Checkout -> sendEffect(CartEffect.CheckoutNotAvailable)
         }
     }
 

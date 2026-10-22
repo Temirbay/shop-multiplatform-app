@@ -19,6 +19,17 @@ data class ProductRoute(val productId: Long) : Route
 @Serializable
 data object CartRoute : Route
 
+/** Шаг 1 оформления: чек */
+@Serializable
+data object OrderReviewRoute : Route
+
+/** Шаг 2 оформления: данные доставки */
+@Serializable
+data object CheckoutRoute : Route
+
+@Serializable
+data class OrderSuccessRoute(val orderId: Long, val totalKzt: Long) : Route
+
 /**
  * Стек экранов сохраняется как список NavKey. На Android подтипы находятся сами, а на iOS, Desktop и Web
  * рефлексии нет — каждый маршрут нужно зарегистрировать здесь, иначе сохранение стека упадёт
@@ -29,6 +40,9 @@ internal val navSavedStateConfig = SavedStateConfiguration {
             subclass(CatalogRoute::class, CatalogRoute.serializer())
             subclass(ProductRoute::class, ProductRoute.serializer())
             subclass(CartRoute::class, CartRoute.serializer())
+            subclass(OrderReviewRoute::class, OrderReviewRoute.serializer())
+            subclass(CheckoutRoute::class, CheckoutRoute.serializer())
+            subclass(OrderSuccessRoute::class, OrderSuccessRoute.serializer())
         }
     }
 }

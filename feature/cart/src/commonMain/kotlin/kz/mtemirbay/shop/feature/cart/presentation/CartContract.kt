@@ -13,9 +13,4 @@ internal sealed interface CartEvent {
     /** Не опускает количество ниже 1: удалить товар можно только кнопкой удаления */
     data class Decrease(val productId: Long) : CartEvent
     data class Remove(val productId: Long) : CartEvent
-    data object Checkout : CartEvent
-}
-
-internal sealed interface CartEffect {
-    data object CheckoutNotAvailable : CartEffect
 }

@@ -30,6 +30,7 @@ kotlin {
             implementation(project(":feature:catalog"))
             implementation(project(":feature:product"))
             implementation(project(":feature:cart"))
+            implementation(project(":feature:checkout"))
             implementation(project(":core:data"))
             implementation(libs.navigation3.ui)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)

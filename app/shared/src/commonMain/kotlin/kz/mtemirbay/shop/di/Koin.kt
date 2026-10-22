@@ -4,6 +4,7 @@ import kz.mtemirbay.shop.core.data.dataModule
 import kz.mtemirbay.shop.core.network.networkModule
 import kz.mtemirbay.shop.feature.cart.di.cartModule
 import kz.mtemirbay.shop.feature.catalog.di.catalogModule
+import kz.mtemirbay.shop.feature.checkout.di.checkoutModule
 import kz.mtemirbay.shop.feature.product.di.productModule
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -16,6 +17,7 @@ val appModules: List<Module> = listOf(
     catalogModule,
     productModule,
     cartModule,
+    checkoutModule,
 )
 
 /**

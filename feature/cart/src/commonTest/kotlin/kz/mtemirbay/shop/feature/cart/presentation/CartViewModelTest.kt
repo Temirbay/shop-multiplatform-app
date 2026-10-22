@@ -2,8 +2,6 @@ package kz.mtemirbay.shop.feature.cart.presentation
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -84,17 +82,6 @@ class CartViewModelTest {
 
         assertTrue(viewModel.state.value.items.isEmpty())
         assertEquals(0L, viewModel.state.value.totalPriceKzt)
-    }
-
-    @Test
-    fun checkoutSendsNotAvailableEffect() = runTest {
-        val viewModel = createViewModel()
-
-        val effect = async { viewModel.effects.first() }
-        viewModel.onEvent(CartEvent.Checkout)
-        advanceUntilIdle()
-
-        assertEquals(CartEffect.CheckoutNotAvailable, effect.await())
     }
 
     private fun TestScope.createViewModel() = CartViewModel(cartRepository).also { advanceUntilIdle() }

@@ -4,7 +4,6 @@
     <string name="cart_go_to_catalog">В каталог</string>
     <string name="cart_total">Итого, %1$d шт.</string>
     <string name="cart_checkout">Оформить заказ</string>
-    <string name="cart_checkout_soon">Оформление заказа появится позже</string>
     <string name="cart_increase">Добавить ещё</string>
     <string name="cart_decrease">Убрать одну штуку</string>
     <string name="cart_remove">Удалить из корзины</string>

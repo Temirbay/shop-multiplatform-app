@@ -8,6 +8,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kz.mtemirbay.shop.feature.cart.presentation.CartScreen
 import kz.mtemirbay.shop.feature.catalog.presentation.CatalogScreen
+import kz.mtemirbay.shop.feature.checkout.presentation.CheckoutScreen
+import kz.mtemirbay.shop.feature.checkout.presentation.OrderReviewScreen
+import kz.mtemirbay.shop.feature.checkout.presentation.OrderSuccessScreen
 import kz.mtemirbay.shop.feature.product.presentation.ProductScreen
 
 @Composable
@@ -15,6 +18,12 @@ fun ShopNavDisplay() {
     // Стек экранов — обычный список: открыть экран = add, вернуться = removeLast
     val backStack = rememberNavBackStack(navSavedStateConfig, CatalogRoute)
     val goBack: () -> Unit = { if (backStack.size > 1) backStack.removeLastOrNull() }
+    // Сбросить стек до каталога: с экрана успеха или из пустой корзины «назад» не должно вести в форму/корзину
+    val resetTo: (Route) -> Unit = { route ->
+        backStack.clear()
+        backStack.add(CatalogRoute)
+        if (route != CatalogRoute) backStack.add(route)
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -44,10 +53,25 @@ fun ShopNavDisplay() {
                 CartScreen(
                     onBack = goBack,
                     // «В каталог» из пустой корзины: убираем всё поверх каталога, а не кладём второй каталог в стек
-                    onGoToCatalog = {
-                        backStack.clear()
-                        backStack.add(CatalogRoute)
-                    },
+                    onGoToCatalog = { resetTo(CatalogRoute) },
+                    onCheckout = { backStack.add(OrderReviewRoute) },
+                )
+            }
+            entry<OrderReviewRoute> {
+                OrderReviewScreen(onBack = goBack, onContinue = { backStack.add(CheckoutRoute) })
+            }
+            entry<CheckoutRoute> {
+                CheckoutScreen(
+                    onBack = goBack,
+                    // Стек станет [Каталог, Успех]: «назад» с экрана успеха — в каталог, а не в форму заказа
+                    onOrderPlaced = { orderId, totalKzt -> resetTo(OrderSuccessRoute(orderId, totalKzt)) },
+                )
+            }
+            entry<OrderSuccessRoute> { route ->
+                OrderSuccessScreen(
+                    orderId = route.orderId,
+                    totalKzt = route.totalKzt,
+                    onGoToCatalog = { resetTo(CatalogRoute) },
                 )
             }
         },

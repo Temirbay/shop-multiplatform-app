@@ -15,9 +15,12 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
+import kz.mtemirbay.shop.data.InMemoryOrderRepository
 import kz.mtemirbay.shop.data.InMemoryProductRepository
+import kz.mtemirbay.shop.data.OrderRepository
 import kz.mtemirbay.shop.data.ProductRepository
 import kz.mtemirbay.shop.routes.categoryRoutes
+import kz.mtemirbay.shop.routes.orderRoutes
 import kz.mtemirbay.shop.routes.productRoutes
 
 fun main() {
@@ -25,7 +28,10 @@ fun main() {
         .start(wait = true)
 }
 
-fun Application.module(repository: ProductRepository = InMemoryProductRepository()) {
+fun Application.module(
+    repository: ProductRepository = InMemoryProductRepository(),
+    orderRepository: OrderRepository = InMemoryOrderRepository(),
+) {
     install(ContentNegotiation) {
         json()
     }
@@ -53,5 +59,6 @@ fun Application.module(repository: ProductRepository = InMemoryProductRepository
     routing {
         productRoutes(repository)
         categoryRoutes(repository)
+        orderRoutes(repository, orderRepository)
     }
 }
