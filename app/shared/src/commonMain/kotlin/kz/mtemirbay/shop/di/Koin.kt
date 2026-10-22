@@ -1,6 +1,7 @@
 package kz.mtemirbay.shop.di
 
 import kz.mtemirbay.shop.core.network.networkModule
+import kz.mtemirbay.shop.feature.catalog.di.catalogModule
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
@@ -8,6 +9,7 @@ import org.koin.dsl.KoinAppDeclaration
 /** Все Koin-модули приложения. Новый модуль (например, catalogModule) добавляется сюда. */
 val appModules: List<Module> = listOf(
     networkModule,
+    catalogModule,
 )
 
 /**

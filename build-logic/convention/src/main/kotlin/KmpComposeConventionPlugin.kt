@@ -1,9 +1,13 @@
 import kz.mtemirbay.shop.buildlogic.androidLibrary
+import kz.mtemirbay.shop.buildlogic.autoNamespace
 import kz.mtemirbay.shop.buildlogic.lib
 import kz.mtemirbay.shop.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -36,6 +40,10 @@ class KmpComposeConventionPlugin : Plugin<Project> {
                 sourceSets.androidMain.dependencies {
                     implementation(libs.lib("compose-uiTooling"))
                 }
+            }
+            // Res-класс ресурсов в пакете модуля, а не в "shopmultiplatformapp.<путь>.generated.resources"
+            extensions.getByType<ComposeExtension>().extensions.configure<ResourcesExtension> {
+                packageOfResClass = "$autoNamespace.generated.resources"
             }
             dependencies.add("androidRuntimeClasspath", libs.lib("compose-uiTooling"))
         }

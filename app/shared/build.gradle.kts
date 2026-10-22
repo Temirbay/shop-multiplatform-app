@@ -23,12 +23,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":core:model"))
             implementation(project(":core:network"))
+            implementation(project(":core:designsystem"))
+            implementation(project(":feature:catalog"))
             api(libs.koin.core)
-        }
-        jsMain.dependencies {
-            implementation(libs.wrappers.browser)
         }
     }
 }

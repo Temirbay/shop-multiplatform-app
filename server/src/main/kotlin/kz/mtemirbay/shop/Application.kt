@@ -1,5 +1,6 @@
 package kz.mtemirbay.shop
 
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -32,6 +33,8 @@ fun Application.module(repository: ProductRepository = InMemoryProductRepository
     install(CORS) {
         // Только для разработки: веб-версия запускается на другом порту, и без CORS браузер блокирует запросы
         anyHost()
+        // Для POST/PUT с JSON-телом (корзина) браузер спросит разрешение на этот заголовок
+        allowHeader(HttpHeaders.ContentType)
     }
     install(StatusPages) {
         // Из нескольких обработчиков выбирается самый специфичный по иерархии классов

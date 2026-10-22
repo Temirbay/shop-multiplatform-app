@@ -1,6 +1,5 @@
 package kz.mtemirbay.shop.core.network
 
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
@@ -52,5 +51,5 @@ class HttpClientFactoryTest {
     }
 
     private fun mockClient(handler: MockRequestHandler) =
-        HttpClient(MockEngine(handler)) { configureShopClient("http://test.local/") }
+        createHttpClient("http://test.local/", MockEngine(handler))
 }
