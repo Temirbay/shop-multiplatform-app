@@ -19,5 +19,9 @@ gradlePlugin {
             id = "shop.kmp.compose"
             implementationClass = "KmpComposeConventionPlugin"
         }
+        register("kmpFeature") {
+            id = "shop.kmp.feature"
+            implementationClass = "KmpFeatureConventionPlugin"
+        }
     }
 }

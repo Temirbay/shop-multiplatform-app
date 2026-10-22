@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.shop.kmp.compose)
+    // Маршруты навигации — @Serializable, чтобы стек экранов переживал поворот и смерть процесса
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -26,6 +28,9 @@ kotlin {
             implementation(project(":core:network"))
             implementation(project(":core:designsystem"))
             implementation(project(":feature:catalog"))
+            implementation(project(":feature:product"))
+            implementation(libs.navigation3.ui)
+            implementation(libs.androidx.lifecycle.viewmodelNavigation3)
             api(libs.koin.core)
         }
     }

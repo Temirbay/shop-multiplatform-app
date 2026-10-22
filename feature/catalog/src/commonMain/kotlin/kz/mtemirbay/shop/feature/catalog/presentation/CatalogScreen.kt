@@ -46,16 +46,17 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CatalogScreen() {
+fun CatalogScreen(onProductClick: (productId: Long) -> Unit) {
     val viewModel = koinViewModel<CatalogViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    CatalogContent(state = state, onEvent = viewModel::onEvent)
+    CatalogContent(state = state, onEvent = viewModel::onEvent, onProductClick = onProductClick)
 }
 
 @Composable
 internal fun CatalogContent(
     state: CatalogState,
     onEvent: (CatalogEvent) -> Unit,
+    onProductClick: (productId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(modifier.fillMaxSize()) {
@@ -88,7 +89,7 @@ internal fun CatalogContent(
                     if (products.items.isEmpty()) {
                         MessageContent(stringResource(Res.string.catalog_empty))
                     } else {
-                        ProductGrid(products.items)
+                        ProductGrid(products.items, onProductClick)
                     }
             }
         }
@@ -124,7 +125,7 @@ private fun CategoryChips(
 }
 
 @Composable
-private fun ProductGrid(products: List<Product>) {
+private fun ProductGrid(products: List<Product>, onProductClick: (Long) -> Unit) {
     LazyVerticalGrid(
         // Adaptive: число колонок зависит от ширины — 2 на телефоне, больше на Desktop и Web
         columns = GridCells.Adaptive(minSize = 160.dp),
@@ -133,14 +134,14 @@ private fun ProductGrid(products: List<Product>) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(products, key = { it.id }) { product ->
-            ProductCard(product)
+            ProductCard(product, onClick = { onProductClick(product.id) })
         }
     }
 }
 
 @Composable
-private fun ProductCard(product: Product) {
-    Card {
+private fun ProductCard(product: Product, onClick: () -> Unit) {
+    Card(onClick = onClick) {
         AsyncImage(
             model = product.imageUrl,
             contentDescription = product.title,
@@ -181,6 +182,7 @@ private fun CatalogContentPreview() {
                 ),
             ),
             onEvent = {},
+            onProductClick = {},
         )
     }
 }
