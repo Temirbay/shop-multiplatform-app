@@ -29,6 +29,8 @@ kotlin {
             implementation(project(":core:designsystem"))
             implementation(project(":feature:catalog"))
             implementation(project(":feature:product"))
+            implementation(project(":feature:cart"))
+            implementation(project(":core:data"))
             implementation(libs.navigation3.ui)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)
             api(libs.koin.core)

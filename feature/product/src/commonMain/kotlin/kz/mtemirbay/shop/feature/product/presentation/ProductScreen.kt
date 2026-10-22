@@ -15,8 +15,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -45,22 +47,31 @@ import kz.mtemirbay.shop.feature.product.generated.resources.product_add_to_cart
 import kz.mtemirbay.shop.feature.product.generated.resources.product_added_to_cart
 import kz.mtemirbay.shop.feature.product.generated.resources.product_error
 import kz.mtemirbay.shop.feature.product.generated.resources.product_not_found
+import kz.mtemirbay.shop.feature.product.generated.resources.product_open_cart
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ProductScreen(productId: Long, onBack: () -> Unit) {
+fun ProductScreen(productId: Long, onBack: () -> Unit, onOpenCart: () -> Unit) {
     // parametersOf: id из маршрута уходит в конструктор ViewModel (см. productModule)
     val viewModel = koinViewModel<ProductViewModel> { parametersOf(productId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val addedMessage = stringResource(Res.string.product_added_to_cart)
+    val openCartLabel = stringResource(Res.string.product_open_cart)
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                ProductEffect.AddedToCart -> snackbarHostState.showSnackbar(addedMessage)
+                ProductEffect.AddedToCart -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = addedMessage,
+                        actionLabel = openCartLabel,
+                        duration = SnackbarDuration.Short,
+                    )
+                    if (result == SnackbarResult.ActionPerformed) onOpenCart()
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import kz.mtemirbay.shop.feature.cart.presentation.CartScreen
 import kz.mtemirbay.shop.feature.catalog.presentation.CatalogScreen
 import kz.mtemirbay.shop.feature.product.presentation.ProductScreen
 
@@ -27,10 +28,27 @@ fun ShopNavDisplay() {
         ),
         entryProvider = entryProvider {
             entry<CatalogRoute> {
-                CatalogScreen(onProductClick = { productId -> backStack.add(ProductRoute(productId)) })
+                CatalogScreen(
+                    onProductClick = { productId -> backStack.add(ProductRoute(productId)) },
+                    onCartClick = { backStack.add(CartRoute) },
+                )
             }
             entry<ProductRoute> { route ->
-                ProductScreen(productId = route.productId, onBack = goBack)
+                ProductScreen(
+                    productId = route.productId,
+                    onBack = goBack,
+                    onOpenCart = { backStack.add(CartRoute) },
+                )
+            }
+            entry<CartRoute> {
+                CartScreen(
+                    onBack = goBack,
+                    // «В каталог» из пустой корзины: убираем всё поверх каталога, а не кладём второй каталог в стек
+                    onGoToCatalog = {
+                        backStack.clear()
+                        backStack.add(CatalogRoute)
+                    },
+                )
             }
         },
     )

@@ -16,6 +16,9 @@ data object CatalogRoute : Route
 @Serializable
 data class ProductRoute(val productId: Long) : Route
 
+@Serializable
+data object CartRoute : Route
+
 /**
  * Стек экранов сохраняется как список NavKey. На Android подтипы находятся сами, а на iOS, Desktop и Web
  * рефлексии нет — каждый маршрут нужно зарегистрировать здесь, иначе сохранение стека упадёт
@@ -25,6 +28,7 @@ internal val navSavedStateConfig = SavedStateConfiguration {
         polymorphic(NavKey::class) {
             subclass(CatalogRoute::class, CatalogRoute.serializer())
             subclass(ProductRoute::class, ProductRoute.serializer())
+            subclass(CartRoute::class, CartRoute.serializer())
         }
     }
 }

@@ -2,6 +2,7 @@ package kz.mtemirbay.shop.feature.catalog.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import kz.mtemirbay.shop.core.designsystem.CartButton
 import kz.mtemirbay.shop.core.designsystem.ShopTheme
 import kz.mtemirbay.shop.core.ui.ErrorContent
 import kz.mtemirbay.shop.core.ui.LoadingContent
@@ -46,10 +49,15 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CatalogScreen(onProductClick: (productId: Long) -> Unit) {
+fun CatalogScreen(onProductClick: (productId: Long) -> Unit, onCartClick: () -> Unit) {
     val viewModel = koinViewModel<CatalogViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    CatalogContent(state = state, onEvent = viewModel::onEvent, onProductClick = onProductClick)
+    CatalogContent(
+        state = state,
+        onEvent = viewModel::onEvent,
+        onProductClick = onProductClick,
+        onCartClick = onCartClick,
+    )
 }
 
 @Composable
@@ -57,15 +65,22 @@ internal fun CatalogContent(
     state: CatalogState,
     onEvent: (CatalogEvent) -> Unit,
     onProductClick: (productId: Long) -> Unit,
+    onCartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(modifier.fillMaxSize()) {
         Column(Modifier.safeDrawingPadding()) {
-            Text(
-                text = stringResource(Res.string.catalog_title),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 16.dp, end = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(Res.string.catalog_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                CartButton(itemCount = state.cartItemCount, onClick = onCartClick)
+            }
             OutlinedTextField(
                 value = state.query,
                 onValueChange = { onEvent(CatalogEvent.QueryChanged(it)) },
@@ -183,6 +198,7 @@ private fun CatalogContentPreview() {
             ),
             onEvent = {},
             onProductClick = {},
+            onCartClick = {},
         )
     }
 }

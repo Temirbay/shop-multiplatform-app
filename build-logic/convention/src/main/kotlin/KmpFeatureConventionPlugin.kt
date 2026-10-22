@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-/** Фича-модуль: экран(ы) на Compose + данные из сети + Koin. */
+/** Фича-модуль: экран(ы) на Compose + данные из сети и общие репозитории (корзина) + Koin. */
 class KmpFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -15,6 +15,7 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
                 sourceSets.commonMain.dependencies {
                     implementation(project(":core:ui"))
                     implementation(project(":core:network"))
+                    implementation(project(":core:data"))
                     implementation(libs.lib("koin-core"))
                     implementation(libs.lib("koin-composeViewModel"))
                     implementation(libs.lib("coil-compose"))

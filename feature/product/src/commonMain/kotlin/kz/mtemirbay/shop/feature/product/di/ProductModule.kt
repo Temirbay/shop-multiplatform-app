@@ -13,5 +13,5 @@ val productModule = module {
     singleOf(::ProductApi)
     singleOf(::ProductRepositoryImpl) bind ProductRepository::class
     // params.get() — productId, переданный из экрана через parametersOf
-    viewModel { params -> ProductViewModel(productId = params.get(), repository = get()) }
+    viewModel { params -> ProductViewModel(productId = params.get(), repository = get(), cartRepository = get()) }
 }

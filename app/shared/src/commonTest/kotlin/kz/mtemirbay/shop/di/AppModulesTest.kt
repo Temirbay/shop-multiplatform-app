@@ -1,9 +1,11 @@
 package kz.mtemirbay.shop.di
 
 import io.ktor.client.HttpClient
+import kz.mtemirbay.shop.core.data.cart.CartRepository
 import org.koin.dsl.koinApplication
 import kotlin.test.Test
 import kotlin.test.assertNotNull
+import kotlin.test.assertSame
 
 class AppModulesTest {
 
@@ -13,5 +15,7 @@ class AppModulesTest {
         val koin = koinApplication { modules(appModules) }.koin
 
         assertNotNull(koin.get<HttpClient>())
+        // single: все фичи получают один и тот же экземпляр корзины
+        assertSame(koin.get<CartRepository>(), koin.get<CartRepository>())
     }
 }

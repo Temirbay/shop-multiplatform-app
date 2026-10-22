@@ -9,6 +9,8 @@ internal data class CatalogState(
     val selectedCategoryId: Long? = null,
     val query: String = "",
     val products: ProductsState = ProductsState.Loading,
+    /** Сколько штук в корзине — для бейджа */
+    val cartItemCount: Int = 0,
 )
 
 internal sealed interface ProductsState {

@@ -1,0 +1,10 @@
+package kz.mtemirbay.shop.core.data
+
+import kz.mtemirbay.shop.core.data.cart.CartRepository
+import kz.mtemirbay.shop.core.data.cart.InMemoryCartRepository
+import org.koin.dsl.module
+
+val dataModule = module {
+    // single — одна корзина на всё приложение: каталог, товар и корзина видят одни и те же данные
+    single<CartRepository> { InMemoryCartRepository() }
+}
