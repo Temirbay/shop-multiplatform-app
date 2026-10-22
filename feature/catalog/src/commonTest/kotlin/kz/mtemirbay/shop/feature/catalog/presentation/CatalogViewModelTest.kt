@@ -9,7 +9,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kz.mtemirbay.shop.core.data.cart.InMemoryCartRepository
+import kz.mtemirbay.shop.core.data.cart.CartRepositoryImpl
+import kz.mtemirbay.shop.core.data.cart.InMemoryCartStorage
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,7 +21,7 @@ import kotlin.test.assertIs
 class CatalogViewModelTest {
 
     private val repository = FakeCatalogRepository()
-    private val cartRepository = InMemoryCartRepository()
+    private val cartRepository = CartRepositoryImpl(InMemoryCartStorage())
 
     // viewModelScope работает на Dispatchers.Main. В тестах подменяем его тестовым диспетчером
     // с виртуальным временем: debounce в 300 мс проходит мгновенно через advanceTimeBy

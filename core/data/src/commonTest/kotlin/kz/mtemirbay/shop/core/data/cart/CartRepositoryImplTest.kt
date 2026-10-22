@@ -4,9 +4,9 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class InMemoryCartRepositoryTest {
+class CartRepositoryImplTest {
 
-    private val repository = InMemoryCartRepository()
+    private val repository = CartRepositoryImpl(InMemoryCartStorage())
 
     @Test
     fun addingSameProductIncreasesQuantity() = runTest {

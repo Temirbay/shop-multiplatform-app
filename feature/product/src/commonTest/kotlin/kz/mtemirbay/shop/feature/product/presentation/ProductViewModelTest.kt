@@ -10,7 +10,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kz.mtemirbay.shop.core.data.cart.CartItem
-import kz.mtemirbay.shop.core.data.cart.InMemoryCartRepository
+import kz.mtemirbay.shop.core.data.cart.CartRepositoryImpl
+import kz.mtemirbay.shop.core.data.cart.InMemoryCartStorage
 import kz.mtemirbay.shop.feature.product.domain.ProductDetails
 import kz.mtemirbay.shop.feature.product.domain.ProductNotFoundException
 import kz.mtemirbay.shop.feature.product.domain.ProductRepository
@@ -24,7 +25,7 @@ class ProductViewModelTest {
 
     private val product = ProductDetails(1, "Смартфон", "Описание", 189_990, "")
     private val repository = FakeProductRepository()
-    private val cartRepository = InMemoryCartRepository()
+    private val cartRepository = CartRepositoryImpl(InMemoryCartStorage())
 
     @BeforeTest
     fun setUp() = Dispatchers.setMain(StandardTestDispatcher())
