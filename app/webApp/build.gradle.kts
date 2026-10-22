@@ -1,4 +1,13 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+
+// 8080 занят :server, поэтому dev-сервер веба — на 8081
+fun KotlinJsBrowserDsl.devServerPort() {
+    commonWebpackConfig {
+        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply { port = 8081 }
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,13 +17,13 @@ plugins {
 
 kotlin {
     js {
-        browser()
+        browser { devServerPort() }
         binaries.executable()
     }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser { devServerPort() }
         binaries.executable()
     }
 

@@ -4,6 +4,7 @@ import kz.mtemirbay.shop.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 class KmpComposeConventionPlugin : Plugin<Project> {
@@ -14,6 +15,11 @@ class KmpComposeConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
             extensions.configure<KotlinMultiplatformExtension> {
+                // Без executable Compose не бандлит Skiko для веб-тестов (CMP-4906)
+                js { binaries.executable() }
+                @OptIn(ExperimentalWasmDsl::class)
+                wasmJs { binaries.executable() }
+
                 androidLibrary {
                     androidResources { enable = true }
                 }

@@ -23,7 +23,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":core"))
+            api(project(":core:model"))
+            implementation(project(":core:network"))
+            api(libs.koin.core)
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
