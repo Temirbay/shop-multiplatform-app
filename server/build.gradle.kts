@@ -3,10 +3,10 @@ plugins {
     alias(libs.plugins.ktor)
 }
 
-group = "com.example.shop_multiplatform_app"
+group = "kz.mtemirbay.shop"
 version = "1.0.0"
 application {
-    mainClass = "com.example.shop_multiplatform_app.ApplicationKt"
+    mainClass = "kz.mtemirbay.shop.ApplicationKt"
 }
 
 dependencies {

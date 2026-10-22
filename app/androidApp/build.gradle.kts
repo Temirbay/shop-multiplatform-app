@@ -20,11 +20,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.example.shop_multiplatform_app"
+    namespace = "kz.mtemirbay.shop"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.example.shop_multiplatform_app"
+        applicationId = "kz.mtemirbay.shop"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

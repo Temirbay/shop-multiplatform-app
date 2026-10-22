@@ -33,7 +33,7 @@ kotlin {
     }
     
     android {
-       namespace = "com.example.shop_multiplatform_app.app.shared"
+       namespace = "kz.mtemirbay.shop.app.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     

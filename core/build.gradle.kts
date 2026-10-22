@@ -22,7 +22,7 @@ kotlin {
     }
     
     android {
-       namespace = "com.example.shop_multiplatform_app.core"
+       namespace = "kz.mtemirbay.shop.core"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     

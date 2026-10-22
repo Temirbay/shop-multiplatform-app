@@ -17,11 +17,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.example.shop_multiplatform_app.MainKt"
+        mainClass = "kz.mtemirbay.shop.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.example.shop_multiplatform_app"
+            packageName = "kz.mtemirbay.shop"
             packageVersion = "1.0.0"
         }
     }
