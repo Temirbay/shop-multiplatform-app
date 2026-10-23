@@ -22,6 +22,12 @@ data object CartRoute : Route
 @Serializable
 data object AccountRoute : Route
 
+@Serializable
+data object MyOrdersRoute : Route
+
+@Serializable
+data class OrderDetailsRoute(val orderId: Long) : Route
+
 /** Шаг 1 оформления: чек */
 @Serializable
 data object OrderReviewRoute : Route
@@ -44,6 +50,8 @@ internal val navSavedStateConfig = SavedStateConfiguration {
             subclass(ProductRoute::class, ProductRoute.serializer())
             subclass(CartRoute::class, CartRoute.serializer())
             subclass(AccountRoute::class, AccountRoute.serializer())
+            subclass(MyOrdersRoute::class, MyOrdersRoute.serializer())
+            subclass(OrderDetailsRoute::class, OrderDetailsRoute.serializer())
             subclass(OrderReviewRoute::class, OrderReviewRoute.serializer())
             subclass(CheckoutRoute::class, CheckoutRoute.serializer())
             subclass(OrderSuccessRoute::class, OrderSuccessRoute.serializer())

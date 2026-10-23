@@ -29,6 +29,8 @@ import kz.mtemirbay.shop.feature.catalog.presentation.CatalogScreen
 import kz.mtemirbay.shop.feature.checkout.presentation.CheckoutScreen
 import kz.mtemirbay.shop.feature.checkout.presentation.OrderReviewScreen
 import kz.mtemirbay.shop.feature.checkout.presentation.OrderSuccessScreen
+import kz.mtemirbay.shop.feature.orders.presentation.MyOrdersScreen
+import kz.mtemirbay.shop.feature.orders.presentation.OrderDetailsScreen
 import kz.mtemirbay.shop.feature.product.presentation.ProductScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -129,7 +131,13 @@ fun ShopNavDisplay(cartItemCount: Int) {
                     )
                 }
                 entry<AccountRoute> {
-                    AccountScreen()
+                    AccountScreen(onMyOrdersClick = { accountStack.add(MyOrdersRoute) })
+                }
+                entry<MyOrdersRoute> {
+                    MyOrdersScreen(onBack = goBack, onOrderClick = { orderId -> accountStack.add(OrderDetailsRoute(orderId)) })
+                }
+                entry<OrderDetailsRoute> { route ->
+                    OrderDetailsScreen(orderId = route.orderId, onBack = goBack)
                 }
             },
         )

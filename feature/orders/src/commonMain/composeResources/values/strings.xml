@@ -1,0 +1,13 @@
+<resources>
+    <string name="orders_title">Мои заказы</string>
+    <string name="orders_empty">Вы ещё ничего не заказывали</string>
+    <string name="orders_error">Не удалось загрузить заказы</string>
+    <string name="order_number">Заказ №%1$d</string>
+    <string name="order_items_count">%1$d шт.</string>
+    <string name="order_not_found">Заказ не найден</string>
+    <string name="order_error">Не удалось загрузить заказ</string>
+    <string name="order_delivery">Доставка</string>
+    <string name="order_items">Состав заказа</string>
+    <string name="order_line">%1$d × %2$s</string>
+    <string name="order_total">Итого, %1$d шт.</string>
+</resources>

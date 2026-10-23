@@ -69,6 +69,7 @@ import kz.mtemirbay.shop.feature.account.generated.resources.auth_register
 import kz.mtemirbay.shop.feature.account.generated.resources.auth_tab_login
 import kz.mtemirbay.shop.feature.account.generated.resources.auth_tab_register
 import kz.mtemirbay.shop.feature.account.generated.resources.profile_logout
+import kz.mtemirbay.shop.feature.account.generated.resources.profile_my_orders
 import kz.mtemirbay.shop.feature.account.generated.resources.profile_logout_cancel
 import kz.mtemirbay.shop.feature.account.generated.resources.profile_logout_message
 import kz.mtemirbay.shop.feature.account.generated.resources.profile_logout_title
@@ -79,7 +80,7 @@ import org.koin.compose.viewmodel.koinViewModel
 /** Корень вкладки «Профиль». Гость — форма входа/регистрации, вошёл — профиль. Переключается само, по сессии */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountScreen() {
+fun AccountScreen(onMyOrdersClick: () -> Unit) {
     val profileViewModel = koinViewModel<ProfileViewModel>()
     val profile by profileViewModel.state.collectAsStateWithLifecycle()
 
@@ -102,7 +103,11 @@ fun AccountScreen() {
                         val authState by authViewModel.state.collectAsStateWithLifecycle()
                         AuthContent(authState, authViewModel::onEvent)
                     }
-                    is ProfileState.LoggedIn -> ProfileContent(state, onLogout = { profileViewModel.onEvent(ProfileEvent.Logout) })
+                    is ProfileState.LoggedIn -> ProfileContent(
+                        state = state,
+                        onMyOrdersClick = onMyOrdersClick,
+                        onLogout = { profileViewModel.onEvent(ProfileEvent.Logout) },
+                    )
                 }
             }
         }
@@ -177,16 +182,19 @@ internal fun AuthContent(state: AuthState, onEvent: (AuthEvent) -> Unit) {
 }
 
 @Composable
-private fun ProfileContent(state: ProfileState.LoggedIn, onLogout: () -> Unit) {
+private fun ProfileContent(state: ProfileState.LoggedIn, onMyOrdersClick: () -> Unit, onLogout: () -> Unit) {
     // rememberSaveable: открытый диалог переживёт поворот экрана
     var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(state.name, style = MaterialTheme.typography.headlineSmall)
         Text(formatPhone(state.phone), style = MaterialTheme.typography.bodyLarge)
+        Button(onClick = onMyOrdersClick, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+            Text(stringResource(Res.string.profile_my_orders))
+        }
         OutlinedButton(
             onClick = { showLogoutConfirmation = true },
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(Res.string.profile_logout))
         }

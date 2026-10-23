@@ -35,6 +35,16 @@ data class ApiError(
     val message: String,
 )
 
+/** Строка списка «Мои заказы» — GET /orders */
+@Serializable
+data class OrderSummaryDto(
+    val id: Long,
+    val totalKzt: Long,
+    val itemCount: Int,
+    /** Миллисекунды Unix, UTC. В местное время переводит клиент */
+    val createdAt: Long,
+)
+
 /** Заказ целиком — GET /orders/{id} */
 @Serializable
 data class OrderDetailsDto(
@@ -43,6 +53,7 @@ data class OrderDetailsDto(
     val phone: String,
     val address: String,
     val totalKzt: Long,
+    val createdAt: Long,
     val items: List<OrderItemDto>,
 )
 

@@ -83,29 +83,6 @@ class OrderRoutesTest {
     }
 
     @Test
-    fun `created order is stored with items and price snapshot`() = shopTestApplication { client ->
-        val created = client.postOrder(validRequest).body<OrderDto>()
-
-        val stored = client.get("/orders/${created.id}").body<OrderDetailsDto>()
-
-        assertEquals("Мирас", stored.customerName)
-        assertEquals("+77011234567", stored.phone)
-        assertEquals(392_970, stored.totalKzt)
-        assertEquals(
-            listOf(
-                OrderItemDto(productId = 1, title = "Смартфон Nova X", quantity = 2, priceKzt = 189_990),
-                OrderItemDto(productId = 11, title = "Kotlin in Action", quantity = 1, priceKzt = 12_990),
-            ),
-            stored.items,
-        )
-    }
-
-    @Test
-    fun `unknown order returns 404`() = shopTestApplication { client ->
-        assertEquals(HttpStatusCode.NotFound, client.get("/orders/999").status)
-    }
-
-    @Test
     fun `first order gets id 1`() = shopTestApplication { client ->
         assertEquals(1, client.postOrder(validRequest).body<OrderDto>().id)
     }

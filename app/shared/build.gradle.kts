@@ -35,6 +35,7 @@ kotlin {
             implementation(project(":feature:cart"))
             implementation(project(":feature:checkout"))
             implementation(project(":feature:account"))
+            implementation(project(":feature:orders"))
             implementation(project(":core:data"))
             implementation(libs.navigation3.ui)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)
