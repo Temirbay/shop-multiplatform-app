@@ -1,22 +1,22 @@
 package kz.mtemirbay.shop.data
 
-import kz.mtemirbay.shop.core.model.OrderItemRequest
+import kz.mtemirbay.shop.core.model.OrderDetailsDto
 
-data class Order(
+/** Позиция нового заказа с ценой, которую сервер взял из своих данных */
+data class NewOrderItem(
+    val productId: Long,
+    val quantity: Int,
+    val priceKzt: Long,
+)
+
+data class CreatedOrder(
     val id: Long,
-    val customerName: String,
-    val phone: String,
-    val address: String,
-    val items: List<OrderItemRequest>,
     val totalKzt: Long,
+    val itemCount: Int,
 )
 
 interface OrderRepository {
-    suspend fun create(
-        customerName: String,
-        phone: String,
-        address: String,
-        items: List<OrderItemRequest>,
-        totalKzt: Long,
-    ): Order
+    suspend fun create(customerName: String, phone: String, address: String, items: List<NewOrderItem>): CreatedOrder
+
+    suspend fun get(id: Long): OrderDetailsDto?
 }

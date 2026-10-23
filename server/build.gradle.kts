@@ -19,7 +19,13 @@ dependencies {
     implementation(libs.ktor.serverCors)
     implementation(libs.ktor.serverStatusPages)
     implementation(libs.ktor.serverCallLogging)
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.h2)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.loggerSlf4j)
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.ktor.clientContentNegotiation)
     testImplementation(libs.kotlin.testJunit)
+    testImplementation(libs.kotlinx.coroutinesTest)
 }

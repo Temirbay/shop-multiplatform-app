@@ -2,18 +2,17 @@ package kz.mtemirbay.shop
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.testing.ApplicationTestBuilder
-import io.ktor.server.testing.testApplication
 import kz.mtemirbay.shop.core.model.ApiError
 import kz.mtemirbay.shop.core.model.CreateOrderRequest
+import kz.mtemirbay.shop.core.model.OrderDetailsDto
 import kz.mtemirbay.shop.core.model.OrderDto
+import kz.mtemirbay.shop.core.model.OrderItemDto
 import kz.mtemirbay.shop.core.model.OrderItemRequest
 import kz.mtemirbay.shop.core.model.OrderValidationError
 import kz.mtemirbay.shop.routes.PRODUCT_NOT_FOUND
@@ -31,7 +30,7 @@ class OrderRoutesTest {
     )
 
     @Test
-    fun `valid order is created with total calculated by server prices`() = orderTest { client ->
+    fun `valid order is created with total calculated by server prices`() = shopTestApplication { client ->
         val response = client.postOrder(validRequest)
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -41,7 +40,7 @@ class OrderRoutesTest {
     }
 
     @Test
-    fun `order ids increase`() = orderTest { client ->
+    fun `order ids increase`() = shopTestApplication { client ->
         val first = client.postOrder(validRequest).body<OrderDto>()
         val second = client.postOrder(validRequest).body<OrderDto>()
 
@@ -49,7 +48,7 @@ class OrderRoutesTest {
     }
 
     @Test
-    fun `blank name returns 400 with validation code`() = orderTest { client ->
+    fun `blank name returns 400 with validation code`() = shopTestApplication { client ->
         val response = client.postOrder(validRequest.copy(customerName = " "))
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -57,14 +56,14 @@ class OrderRoutesTest {
     }
 
     @Test
-    fun `phone without plus seven returns 400`() = orderTest { client ->
+    fun `phone without plus seven returns 400`() = shopTestApplication { client ->
         val response = client.postOrder(validRequest.copy(phone = "87011234567"))
 
         assertEquals(OrderValidationError.PHONE_INVALID.name, response.body<ApiError>().code)
     }
 
     @Test
-    fun `unknown product returns 400`() = orderTest { client ->
+    fun `unknown product returns 400`() = shopTestApplication { client ->
         val response = client.postOrder(validRequest.copy(items = listOf(OrderItemRequest(999, 1))))
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -72,7 +71,7 @@ class OrderRoutesTest {
     }
 
     @Test
-    fun `empty cart returns 400`() = orderTest { client ->
+    fun `empty cart returns 400`() = shopTestApplication { client ->
         val response = client.postOrder(validRequest.copy(items = emptyList()))
 
         assertEquals(OrderValidationError.ITEMS_EMPTY.name, response.body<ApiError>().code)
@@ -83,11 +82,31 @@ class OrderRoutesTest {
         setBody(request)
     }
 
-    private fun orderTest(block: suspend ApplicationTestBuilder.(HttpClient) -> Unit) = testApplication {
-        application { module() }
-        val client = createClient {
-            install(ContentNegotiation) { json() }
-        }
-        block(client)
+    @Test
+    fun `created order is stored with items and price snapshot`() = shopTestApplication { client ->
+        val created = client.postOrder(validRequest).body<OrderDto>()
+
+        val stored = client.get("/orders/${created.id}").body<OrderDetailsDto>()
+
+        assertEquals("Мирас", stored.customerName)
+        assertEquals("+77011234567", stored.phone)
+        assertEquals(392_970, stored.totalKzt)
+        assertEquals(
+            listOf(
+                OrderItemDto(productId = 1, title = "Смартфон Nova X", quantity = 2, priceKzt = 189_990),
+                OrderItemDto(productId = 11, title = "Kotlin in Action", quantity = 1, priceKzt = 12_990),
+            ),
+            stored.items,
+        )
+    }
+
+    @Test
+    fun `unknown order returns 404`() = shopTestApplication { client ->
+        assertEquals(HttpStatusCode.NotFound, client.get("/orders/999").status)
+    }
+
+    @Test
+    fun `first order gets id 1`() = shopTestApplication { client ->
+        assertEquals(1, client.postOrder(validRequest).body<OrderDto>().id)
     }
 }

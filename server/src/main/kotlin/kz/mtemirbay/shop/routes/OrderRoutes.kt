@@ -1,15 +1,19 @@
 package kz.mtemirbay.shop.routes
 
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingCall
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import kz.mtemirbay.shop.core.model.ApiError
 import kz.mtemirbay.shop.core.model.CreateOrderRequest
 import kz.mtemirbay.shop.core.model.OrderDto
 import kz.mtemirbay.shop.core.model.OrderValidation
+import kz.mtemirbay.shop.data.NewOrderItem
 import kz.mtemirbay.shop.data.OrderRepository
 import kz.mtemirbay.shop.data.ProductRepository
 
@@ -25,24 +29,24 @@ fun Route.orderRoutes(products: ProductRepository, orders: OrderRepository) {
         }
 
         // Цену берём из своих данных, а не из запроса. Заодно проверяем, что товары существуют
-        var totalKzt = 0L
-        for (item in request.items) {
+        val pricedItems = request.items.map { item ->
             val product = products.getProduct(item.productId)
                 ?: return@post call.respondError(PRODUCT_NOT_FOUND, "Product ${item.productId} not found")
-            totalKzt += product.priceKzt * item.quantity
+            NewOrderItem(productId = item.productId, quantity = item.quantity, priceKzt = product.priceKzt)
         }
 
         val order = orders.create(
             customerName = request.customerName.trim(),
             phone = OrderValidation.normalizePhone(request.phone),
             address = request.address.trim(),
-            items = request.items,
-            totalKzt = totalKzt,
+            items = pricedItems,
         )
-        call.respond(
-            HttpStatusCode.Created,
-            OrderDto(id = order.id, totalKzt = order.totalKzt, itemCount = request.items.sumOf { it.quantity }),
-        )
+        call.respond(HttpStatusCode.Created, OrderDto(id = order.id, totalKzt = order.totalKzt, itemCount = order.itemCount))
+    }
+    get("/orders/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid order id")
+        val order = orders.get(id) ?: throw NotFoundException("Order $id not found")
+        call.respond(order)
     }
 }
 

@@ -5,8 +5,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.calllogging.CallLogging
@@ -15,23 +14,25 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
-import kz.mtemirbay.shop.data.InMemoryOrderRepository
-import kz.mtemirbay.shop.data.InMemoryProductRepository
 import kz.mtemirbay.shop.data.OrderRepository
 import kz.mtemirbay.shop.data.ProductRepository
+import kz.mtemirbay.shop.di.serverModule
 import kz.mtemirbay.shop.routes.categoryRoutes
 import kz.mtemirbay.shop.routes.orderRoutes
 import kz.mtemirbay.shop.routes.productRoutes
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
-fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
+/** Порт, URL базы и список модулей — в application.conf */
+fun main(args: Array<String>) = EngineMain.main(args)
 
-fun Application.module(
-    repository: ProductRepository = InMemoryProductRepository(),
-    orderRepository: OrderRepository = InMemoryOrderRepository(),
-) {
+fun Application.module() {
+    install(Koin) {
+        slf4jLogger()
+        modules(serverModule(databaseUrl = environment.config.property("database.url").getString()))
+    }
+
     install(ContentNegotiation) {
         json()
     }
@@ -56,9 +57,11 @@ fun Application.module(
             call.respondText("Internal server error", status = HttpStatusCode.InternalServerError)
         }
     }
+    val productRepository by inject<ProductRepository>()
+    val orderRepository by inject<OrderRepository>()
     routing {
-        productRoutes(repository)
-        categoryRoutes(repository)
-        orderRoutes(repository, orderRepository)
+        productRoutes(productRepository)
+        categoryRoutes(productRepository)
+        orderRoutes(productRepository, orderRepository)
     }
 }

@@ -1,19 +1,19 @@
-package kz.mtemirbay.shop.data
+package kz.mtemirbay.shop.db
 
 import kz.mtemirbay.shop.core.model.CategoryDto
 import kz.mtemirbay.shop.core.model.ProductDto
 
-/** Мок-данные в памяти. Позже заменим на БД, не меняя роуты — они знают только интерфейс. */
-class InMemoryProductRepository : ProductRepository {
+/** Начальные данные: записываются в пустую БД при первом старте */
+internal object SeedData {
 
-    private val categories = listOf(
+    val categories = listOf(
         CategoryDto(id = 1, title = "Электроника"),
         CategoryDto(id = 2, title = "Одежда"),
         CategoryDto(id = 3, title = "Книги"),
         CategoryDto(id = 4, title = "Дом"),
     )
 
-    private val products = listOf(
+    val products = listOf(
         product(1, "Смартфон Nova X", "6.5\" OLED, 128 ГБ, 5000 мА·ч", 189_990, categoryId = 1),
         product(2, "Беспроводные наушники Pulse", "Шумоподавление, до 30 часов работы", 39_990, categoryId = 1),
         product(3, "Ноутбук Air 14", "14\", 16 ГБ RAM, 512 ГБ SSD", 449_990, categoryId = 1),
@@ -33,15 +33,6 @@ class InMemoryProductRepository : ProductRepository {
         product(17, "Настольная лампа Lumen", "Регулировка яркости и температуры", 11_990, categoryId = 4),
         product(18, "Набор посуды Chef", "10 предметов, нержавеющая сталь", 44_990, categoryId = 4),
     )
-
-    override suspend fun getCategories(): List<CategoryDto> = categories
-
-    override suspend fun getProducts(categoryId: Long?, query: String?): List<ProductDto> =
-        products
-            .filter { categoryId == null || it.categoryId == categoryId }
-            .filter { query.isNullOrBlank() || it.title.contains(query, ignoreCase = true) }
-
-    override suspend fun getProduct(id: Long): ProductDto? = products.find { it.id == id }
 
     private fun product(id: Long, title: String, description: String, priceKzt: Long, categoryId: Long) =
         ProductDto(

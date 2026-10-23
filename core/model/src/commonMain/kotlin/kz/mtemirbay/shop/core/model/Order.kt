@@ -34,3 +34,23 @@ data class ApiError(
     val code: String,
     val message: String,
 )
+
+/** Заказ целиком — GET /orders/{id} */
+@Serializable
+data class OrderDetailsDto(
+    val id: Long,
+    val customerName: String,
+    val phone: String,
+    val address: String,
+    val totalKzt: Long,
+    val items: List<OrderItemDto>,
+)
+
+/** [priceKzt] — цена на момент заказа, а не текущая цена товара */
+@Serializable
+data class OrderItemDto(
+    val productId: Long,
+    val title: String,
+    val quantity: Int,
+    val priceKzt: Long,
+)
