@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import kz.mtemirbay.shop.core.data.cart.CartItem
-import kz.mtemirbay.shop.core.designsystem.BackButton
 import kz.mtemirbay.shop.core.designsystem.ShopIcons
 import kz.mtemirbay.shop.core.designsystem.ShopTheme
 import kz.mtemirbay.shop.core.ui.formatPriceKzt
@@ -56,14 +55,14 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+/** Корень вкладки «Корзина»: стрелки «назад» нет, переход — нижней панелью */
 @Composable
-fun CartScreen(onBack: () -> Unit, onGoToCatalog: () -> Unit, onCheckout: () -> Unit) {
+fun CartScreen(onGoToCatalog: () -> Unit, onCheckout: () -> Unit) {
     val viewModel = koinViewModel<CartViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     CartContent(
         state = state,
-        onBack = onBack,
         onGoToCatalog = onGoToCatalog,
         onCheckout = onCheckout,
         onEvent = viewModel::onEvent,
@@ -74,7 +73,6 @@ fun CartScreen(onBack: () -> Unit, onGoToCatalog: () -> Unit, onCheckout: () -> 
 @Composable
 internal fun CartContent(
     state: CartState,
-    onBack: () -> Unit,
     onGoToCatalog: () -> Unit,
     onCheckout: () -> Unit,
     onEvent: (CartEvent) -> Unit,
@@ -83,7 +81,6 @@ internal fun CartContent(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.cart_title)) },
-                navigationIcon = { BackButton(onClick = onBack) },
             )
         },
         bottomBar = {
@@ -214,7 +211,6 @@ private fun CartContentPreview() {
                 totalQuantity = 3,
                 totalPriceKzt = 392_970,
             ),
-            onBack = {},
             onGoToCatalog = {},
             onCheckout = {},
             onEvent = {},

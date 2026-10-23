@@ -4,6 +4,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -14,6 +16,8 @@ import kotlinx.coroutines.test.setMain
 import kz.mtemirbay.shop.core.data.cart.CartItem
 import kz.mtemirbay.shop.core.data.cart.CartRepositoryImpl
 import kz.mtemirbay.shop.core.data.cart.InMemoryCartStorage
+import kz.mtemirbay.shop.core.data.session.Session
+import kz.mtemirbay.shop.core.data.session.SessionRepository
 import kz.mtemirbay.shop.core.model.OrderField
 import kz.mtemirbay.shop.core.model.OrderValidationError
 import kz.mtemirbay.shop.feature.checkout.domain.CheckoutRepository
@@ -33,6 +37,7 @@ class CheckoutViewModelTest {
         InMemoryCartStorage(listOf(CartItem(1, "Смартфон", 189_990, "", quantity = 2))),
     )
     private val checkoutRepository = FakeCheckoutRepository()
+    private val sessionRepository = FakeSessionRepository()
 
     @BeforeTest
     fun setUp() = Dispatchers.setMain(StandardTestDispatcher())
@@ -47,6 +52,26 @@ class CheckoutViewModelTest {
         assertEquals(listOf(CartItem(1, "Смартфон", 189_990, "", quantity = 2)), viewModel.state.value.items)
         assertEquals(2, viewModel.state.value.itemCount)
         assertEquals(379_980, viewModel.state.value.totalKzt)
+    }
+
+    @Test
+    fun guestFormStartsEmpty() = runTest {
+        val viewModel = createViewModel()
+
+        assertEquals("", viewModel.state.value.name)
+        assertEquals("", viewModel.state.value.phone)
+    }
+
+    @Test
+    fun loggedInUserGetsNameAndPhonePrefilled() = runTest {
+        sessionRepository.save(Session(token = "jwt", userId = 1, name = "Мирас", phone = "+77011234567"))
+
+        val viewModel = createViewModel()
+
+        assertEquals("Мирас", viewModel.state.value.name)
+        // В форме — только 10 цифр, +7 рисует префикс поля
+        assertEquals("7011234567", viewModel.state.value.phone)
+        assertTrue(viewModel.state.value.errors.isEmpty())
     }
 
     @Test
@@ -140,7 +165,7 @@ class CheckoutViewModelTest {
     }
 
     private fun TestScope.createViewModel() =
-        CheckoutViewModel(checkoutRepository, cartRepository).also { advanceUntilIdle() }
+        CheckoutViewModel(checkoutRepository, cartRepository, sessionRepository).also { advanceUntilIdle() }
 
     private fun CheckoutViewModel.fillValidForm() = apply {
         onEvent(CheckoutEvent.NameChanged("Мирас"))
@@ -160,6 +185,19 @@ class CheckoutViewModelTest {
         ): Result<PlacedOrder> {
             calls++
             return response()
+        }
+    }
+
+    private class FakeSessionRepository : SessionRepository {
+        private val _session = MutableStateFlow<Session?>(null)
+        override val session: StateFlow<Session?> = _session
+
+        override suspend fun save(session: Session) {
+            _session.value = session
+        }
+
+        override suspend fun clear() {
+            _session.value = null
         }
     }
 }

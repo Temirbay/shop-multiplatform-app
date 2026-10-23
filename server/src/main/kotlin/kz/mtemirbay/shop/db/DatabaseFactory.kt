@@ -15,7 +15,7 @@ object DatabaseFactory {
     fun init(url: String): Database {
         val database = Database.connect(url = url, driver = "org.h2.Driver")
         transaction(database) {
-            SchemaUtils.create(Categories, Products, Orders, OrderItems)
+            SchemaUtils.create(Categories, Products, Users, Orders, OrderItems)
             if (Products.selectAll().empty()) seed()
         }
         return database

@@ -2,6 +2,8 @@ package kz.mtemirbay.shop.di
 
 import io.ktor.client.HttpClient
 import kz.mtemirbay.shop.core.data.cart.CartRepository
+import kz.mtemirbay.shop.core.data.session.SessionRepository
+import kz.mtemirbay.shop.core.network.AuthTokenProvider
 import org.koin.dsl.koinApplication
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -17,5 +19,7 @@ class AppModulesTest {
         assertNotNull(koin.get<HttpClient>())
         // single: все фичи получают один и тот же экземпляр корзины
         assertSame(koin.get<CartRepository>(), koin.get<CartRepository>())
+        // Сеть берёт токен из той же сессии, которую сохраняет экран входа
+        assertSame<Any>(koin.get<SessionRepository>(), koin.get<AuthTokenProvider>())
     }
 }

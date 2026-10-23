@@ -13,14 +13,12 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kz.mtemirbay.shop.core.data.cart.CartRepository
 import kz.mtemirbay.shop.core.ui.MviViewModel
 import kz.mtemirbay.shop.feature.catalog.domain.CatalogRepository
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class CatalogViewModel(
     private val repository: CatalogRepository,
-    private val cartRepository: CartRepository,
 ) : MviViewModel<CatalogState, CatalogEvent, Nothing>(CatalogState()) {
 
     private val reloadTrigger = MutableStateFlow(0)
@@ -28,7 +26,6 @@ internal class CatalogViewModel(
     init {
         loadCategories()
         observeProducts()
-        observeCart()
     }
 
     override fun onEvent(event: CatalogEvent) {
@@ -49,15 +46,6 @@ internal class CatalogViewModel(
                 setState { copy(categories = categories) }
             }
         }
-    }
-
-    /** Корзина меняется на других экранах — бейдж обновляется сам, через общий StateFlow */
-    private fun observeCart() {
-        cartRepository.items
-            .map { items -> items.sumOf { it.quantity } }
-            .distinctUntilChanged()
-            .onEach { count -> setState { copy(cartItemCount = count) } }
-            .launchIn(viewModelScope)
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)

@@ -17,14 +17,20 @@ import kotlinx.serialization.json.Json
  * @param engine null — движок платформы из зависимостей (OkHttp, Darwin, Js).
  * В тестах передаётся MockEngine, чтобы проверить код с той же настройкой клиента, что и в приложении.
  */
-fun createHttpClient(baseUrl: String, engine: HttpClientEngine? = null): HttpClient =
+fun createHttpClient(
+    baseUrl: String,
+    engine: HttpClientEngine? = null,
+    tokenProvider: AuthTokenProvider? = null,
+): HttpClient =
     if (engine == null) {
-        HttpClient { configureShopClient(baseUrl) }
+        HttpClient { configureShopClient(baseUrl, tokenProvider) }
     } else {
-        HttpClient(engine) { configureShopClient(baseUrl) }
+        HttpClient(engine) { configureShopClient(baseUrl, tokenProvider) }
     }
 
-private fun HttpClientConfig<*>.configureShopClient(baseUrl: String) {
+private fun HttpClientConfig<*>.configureShopClient(baseUrl: String, tokenProvider: AuthTokenProvider?) {
+    tokenProvider?.let { install(bearerSessionPlugin(it)) }
+
     // Без expectSuccess Ktor не бросает исключение на 4xx/5xx — ответ пришлось бы проверять вручную
     expectSuccess = true
 

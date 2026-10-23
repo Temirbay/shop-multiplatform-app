@@ -45,6 +45,8 @@ import kz.mtemirbay.shop.core.designsystem.BackButton
 import kz.mtemirbay.shop.core.designsystem.ShopTheme
 import kz.mtemirbay.shop.core.model.OrderField
 import kz.mtemirbay.shop.core.model.OrderValidationError
+import kz.mtemirbay.shop.core.ui.COUNTRY_CODE
+import kz.mtemirbay.shop.core.ui.PhoneVisualTransformation
 import kz.mtemirbay.shop.feature.checkout.generated.resources.Res
 import kz.mtemirbay.shop.feature.checkout.generated.resources.checkout_address
 import kz.mtemirbay.shop.feature.checkout.generated.resources.checkout_error_address

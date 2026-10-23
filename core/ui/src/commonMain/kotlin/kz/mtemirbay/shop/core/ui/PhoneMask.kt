@@ -1,4 +1,4 @@
-package kz.mtemirbay.shop.feature.checkout.presentation
+package kz.mtemirbay.shop.core.ui
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
@@ -6,16 +6,16 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 
 /** Номер без кода страны: 10 цифр. Код +7 — фиксированный префикс поля */
-internal const val PHONE_DIGITS = 10
+const val PHONE_DIGITS = 10
 
-internal const val COUNTRY_CODE = "+7"
+const val COUNTRY_CODE = "+7"
 
 /**
  * Из того, что ввёл или вставил пользователь, — только цифры номера, не больше 10.
  * Вставка «+7 701 123 45 67» или «8 701 123 45 67» (11 цифр за раз) — первая 7/8 это код страны, отбрасываем.
  * Ввод 11-й цифры по одной просто игнорируется, а не сдвигает номер
  */
-internal fun phoneDigitsFromInput(input: String, previousDigits: String): String {
+fun phoneDigitsFromInput(input: String, previousDigits: String): String {
     val digits = input.filter { it.isDigit() }
     val isPastedWithCountryCode = digits.length == PHONE_DIGITS + 1 &&
         digits.length - previousDigits.length > 1 &&
@@ -27,7 +27,7 @@ internal fun phoneDigitsFromInput(input: String, previousDigits: String): String
  * Рисует «7011234567» как «(701) 123-45-67», не меняя сам текст в состоянии.
  * Поэтому в state и в запрос уходят только цифры, а курсор не прыгает при вводе скобок и дефисов
  */
-internal object PhoneVisualTransformation : VisualTransformation {
+object PhoneVisualTransformation : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
         val digits = text.text
@@ -52,4 +52,10 @@ internal object PhoneVisualTransformation : VisualTransformation {
         }
         return TransformedText(AnnotatedString(formatted.toString()), mapping)
     }
+}
+
+/** «+77011234567» → «+7 (701) 123-45-67» — для показа номера, а не для поля ввода */
+fun formatPhone(normalizedPhone: String): String {
+    val digits = normalizedPhone.removePrefix(COUNTRY_CODE).filter { it.isDigit() }
+    return "$COUNTRY_CODE " + PhoneVisualTransformation.filter(AnnotatedString(digits)).text.text
 }

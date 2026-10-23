@@ -5,16 +5,20 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kz.mtemirbay.shop.core.data.cart.CartRepository
+import kz.mtemirbay.shop.core.data.session.SessionRepository
 import kz.mtemirbay.shop.core.model.OrderField
 import kz.mtemirbay.shop.core.model.OrderValidation
 import kz.mtemirbay.shop.core.model.OrderValidationError
+import kz.mtemirbay.shop.core.ui.COUNTRY_CODE
 import kz.mtemirbay.shop.core.ui.MviViewModel
+import kz.mtemirbay.shop.core.ui.phoneDigitsFromInput
 import kz.mtemirbay.shop.feature.checkout.domain.CheckoutRepository
 import kz.mtemirbay.shop.feature.checkout.domain.OrderRejectedException
 
 internal class CheckoutViewModel(
     private val checkoutRepository: CheckoutRepository,
     private val cartRepository: CartRepository,
+    sessionRepository: SessionRepository,
 ) : MviViewModel<CheckoutState, CheckoutEvent, CheckoutEffect>(CheckoutState()) {
 
     /** Поля, ошибки которых уже показываем. Пока пользователь не дошёл до поля, не ругаемся на пустое */
@@ -24,6 +28,11 @@ internal class CheckoutViewModel(
     private var serverError: OrderValidationError? = null
 
     init {
+        // Вошёл — имя и телефон берём из профиля. Один раз, при открытии формы: дальше поля в руках пользователя,
+        // например, чтобы оформить заказ на другого человека
+        sessionRepository.session.value?.let { session ->
+            setState { copy(name = session.name, phone = session.phone.removePrefix(COUNTRY_CODE)) }
+        }
         cartRepository.items
             .onEach { items ->
                 setState {

@@ -15,11 +15,24 @@ object Products : LongIdTable("products") {
     val categoryId = reference("category_id", Categories)
 }
 
+object Users : LongIdTable("users") {
+    val name = varchar("name", length = 100)
+    // uniqueIndex: два аккаунта на один номер БД не пропустит, даже если два запроса придут одновременно
+    val phone = varchar("phone", length = 20).uniqueIndex()
+    /** bcrypt-хэш. Сам пароль нигде не хранится */
+    val passwordHash = varchar("password_hash", length = 100)
+    val createdAt = long("created_at")
+}
+
 object Orders : LongIdTable("orders") {
+    /** null — заказ гостя */
+    val userId = optReference("user_id", Users)
     val customerName = varchar("customer_name", length = 100)
     val phone = varchar("phone", length = 20)
     val address = text("address")
     val totalKzt = long("total_kzt")
+    /** Время создания, миллисекунды Unix — для сортировки «Моих заказов» */
+    val createdAt = long("created_at")
 }
 
 object OrderItems : LongIdTable("order_items") {

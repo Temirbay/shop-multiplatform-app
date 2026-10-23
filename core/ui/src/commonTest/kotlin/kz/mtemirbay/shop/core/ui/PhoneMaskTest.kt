@@ -1,4 +1,4 @@
-package kz.mtemirbay.shop.feature.checkout.presentation
+package kz.mtemirbay.shop.core.ui
 
 import androidx.compose.ui.text.AnnotatedString
 import kotlin.test.Test
@@ -37,6 +37,11 @@ class PhoneMaskTest {
     fun pastedNumberWithCountryCodeDropsIt() {
         assertEquals("7011234567", phoneDigitsFromInput("+7 701 123 45 67", previousDigits = ""))
         assertEquals("7011234567", phoneDigitsFromInput("8 (701) 123-45-67", previousDigits = ""))
+    }
+
+    @Test
+    fun formatsNormalizedPhoneForDisplay() {
+        assertEquals("+7 (701) 123-45-67", formatPhone("+77011234567"))
     }
 
     private fun format(digits: String) = PhoneVisualTransformation.filter(AnnotatedString(digits)).text.text

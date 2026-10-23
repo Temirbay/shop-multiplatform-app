@@ -8,6 +8,7 @@ kotlin {
         commonMain.dependencies {
             // api: StateFlow — часть публичного CartRepository, модулям-потребителям нужен этот тип
             api(libs.kotlinx.coroutinesCore)
+            implementation(project(":core:network"))
             implementation(libs.koin.core)
             implementation(libs.kotlinx.serialization.json)
             // api: Settings — в публичном конструкторе SettingsCartStorage

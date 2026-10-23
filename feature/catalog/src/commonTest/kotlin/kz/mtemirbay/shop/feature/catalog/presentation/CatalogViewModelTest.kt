@@ -9,8 +9,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kz.mtemirbay.shop.core.data.cart.CartRepositoryImpl
-import kz.mtemirbay.shop.core.data.cart.InMemoryCartStorage
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -21,7 +19,6 @@ import kotlin.test.assertIs
 class CatalogViewModelTest {
 
     private val repository = FakeCatalogRepository()
-    private val cartRepository = CartRepositoryImpl(InMemoryCartStorage())
 
     // viewModelScope работает на Dispatchers.Main. В тестах подменяем его тестовым диспетчером
     // с виртуальным временем: debounce в 300 мс проходит мгновенно через advanceTimeBy
@@ -33,7 +30,7 @@ class CatalogViewModelTest {
 
     @Test
     fun initialLoadShowsProductsAndCategories() = runTest {
-        val viewModel = CatalogViewModel(repository, cartRepository)
+        val viewModel = CatalogViewModel(repository)
 
         advanceUntilIdle()
 
@@ -45,7 +42,7 @@ class CatalogViewModelTest {
     @Test
     fun errorThenRetryShowsProducts() = runTest {
         repository.productsError = RuntimeException("Network")
-        val viewModel = CatalogViewModel(repository, cartRepository)
+        val viewModel = CatalogViewModel(repository)
         advanceUntilIdle()
         assertIs<ProductsState.Error>(viewModel.state.value.products)
 
@@ -58,7 +55,7 @@ class CatalogViewModelTest {
 
     @Test
     fun selectingCategoryRequestsProductsOfThatCategory() = runTest {
-        val viewModel = CatalogViewModel(repository, cartRepository)
+        val viewModel = CatalogViewModel(repository)
         advanceUntilIdle()
 
         viewModel.onEvent(CatalogEvent.CategorySelected(3))
@@ -70,7 +67,7 @@ class CatalogViewModelTest {
 
     @Test
     fun fastTypingSendsSingleRequestAfterDebounce() = runTest {
-        val viewModel = CatalogViewModel(repository, cartRepository)
+        val viewModel = CatalogViewModel(repository)
         advanceUntilIdle()
         repository.productRequests.clear()
 
@@ -85,19 +82,5 @@ class CatalogViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf<Pair<Long?, String>>(null to "kot"), repository.productRequests)
-    }
-
-    @Test
-    fun cartBadgeFollowsCartChangesFromOtherScreens() = runTest {
-        val viewModel = CatalogViewModel(repository, cartRepository)
-        advanceUntilIdle()
-        assertEquals(0, viewModel.state.value.cartItemCount)
-
-        // Как будто товар добавили на экране товара — каталог узнаёт об этом через общий StateFlow
-        cartRepository.add(1, "Смартфон", 189_990, "")
-        cartRepository.add(1, "Смартфон", 189_990, "")
-        advanceUntilIdle()
-
-        assertEquals(2, viewModel.state.value.cartItemCount)
     }
 }

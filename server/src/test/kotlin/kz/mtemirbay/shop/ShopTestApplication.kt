@@ -17,7 +17,13 @@ fun inMemoryDatabaseUrl() = "jdbc:h2:mem:test-${Uuid.random()};DB_CLOSE_DELAY=-1
 fun shopTestApplication(block: suspend ApplicationTestBuilder.(HttpClient) -> Unit) = testApplication {
     // Свой конфиг вместо application.conf: иначе тесты писали бы в настоящий файл БД
     environment {
-        config = MapApplicationConfig("database.url" to inMemoryDatabaseUrl())
+        config = MapApplicationConfig(
+            "database.url" to inMemoryDatabaseUrl(),
+            "jwt.secret" to "test-secret",
+            "jwt.issuer" to "shop-server",
+            "jwt.audience" to "shop-app",
+            "jwt.validityDays" to "30",
+        )
     }
     application { module() }
     val client = createClient {

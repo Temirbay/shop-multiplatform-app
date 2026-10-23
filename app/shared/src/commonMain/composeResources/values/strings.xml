@@ -1,0 +1,5 @@
+<resources>
+    <string name="tab_catalog">Каталог</string>
+    <string name="tab_cart">Корзина</string>
+    <string name="tab_account">Профиль</string>
+</resources>

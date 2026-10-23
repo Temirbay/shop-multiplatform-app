@@ -29,6 +29,7 @@ class ExposedOrderRepository(private val database: Database) : OrderRepository {
                 it[Orders.phone] = phone
                 it[Orders.address] = address
                 it[Orders.totalKzt] = totalKzt
+                it[Orders.createdAt] = System.currentTimeMillis()
             }
             OrderItems.batchInsert(items) { item ->
                 this[OrderItems.orderId] = orderId

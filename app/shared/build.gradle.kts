@@ -24,6 +24,9 @@ kotlin {
     }
 
     sourceSets {
+        commonTest.dependencies {
+            implementation(libs.kotlinx.coroutinesTest)
+        }
         commonMain.dependencies {
             implementation(project(":core:network"))
             implementation(project(":core:designsystem"))
@@ -31,10 +34,12 @@ kotlin {
             implementation(project(":feature:product"))
             implementation(project(":feature:cart"))
             implementation(project(":feature:checkout"))
+            implementation(project(":feature:account"))
             implementation(project(":core:data"))
             implementation(libs.navigation3.ui)
             implementation(libs.androidx.lifecycle.viewmodelNavigation3)
             api(libs.koin.core)
+            implementation(libs.koin.composeViewModel)
         }
     }
 }
